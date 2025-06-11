@@ -18,7 +18,7 @@ export class Engine {
     constructor(options: EngineOptions) {
         this.init(options);
         this.start();
-        requestAnimationFrame(this.update);
+        requestAnimationFrame(this.update.bind(this));
     };
     init(options: EngineOptions) {// used to init all the important libs / files
         this.canvas = options.canvas ?? null;
@@ -43,7 +43,7 @@ export class Engine {
         this.ctx.scale(dpr, dpr);
         this.entityManager = new EntityManager();
         if (!this.entityManager) throw new Error("ENTITY MANAGER NOT FOUND!");
-        this.resources = options.resources;
+        this.resources = options.resources ?? {};
         this.assetLoader = new AssetLoader(this.resources);
 
     };

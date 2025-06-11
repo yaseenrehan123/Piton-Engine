@@ -1,8 +1,8 @@
 export type EngineOptions = {
-    canvas: HTMLCanvasElement,
-    canvasWidth: number,
-    canvasHeight: number,
-    resources: AssetResources
+    canvas?: HTMLCanvasElement,
+    canvasWidth?: number,
+    canvasHeight?: number,
+    resources?: AssetResources
 }
 export type AssetResources = {
     images_JSON_path?: string,
