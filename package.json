@@ -1,13 +1,12 @@
 {
   "name": "piton-engine",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A typescript game engine",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build":"tsup"
-
+    "build": "tsup"
   },
   "repository": {
     "type": "git",
@@ -26,8 +25,10 @@
   },
   "homepage": "https://github.com/yaseenrehan123/Piton-Engine#readme",
   "devDependencies": {
-    "entix-ecs": "^0.0.2",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "entix-ecs": "^0.0.2"
   }
 }
