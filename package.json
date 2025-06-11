@@ -1,0 +1,33 @@
+{
+  "name": "piton-engine",
+  "version": "0.0.1",
+  "description": "A typescript game engine",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist.index.d.ts",
+  "scripts": {
+    "build":"tsup"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaseenrehan123/Piton-Engine.git"
+  },
+  "keywords": [
+    "GameEngine",
+    "Typescript",
+    "Gamedev",
+    "Entities"
+  ],
+  "author": "magstardev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yaseenrehan123/Piton-Engine/issues"
+  },
+  "homepage": "https://github.com/yaseenrehan123/Piton-Engine#readme",
+  "devDependencies": {
+    "entix-ecs": "^0.0.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  }
+}
