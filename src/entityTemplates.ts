@@ -2,7 +2,7 @@ import { EntityId, EntityManager } from "entix-ecs";
 import { Engine } from "./engine";
 import { Sprite, Transform } from "./components";
 
-export class Entities {
+export class EntityTemplates {
     private engine:Engine;
     private em:EntityManager;;
     constructor(engine:Engine){

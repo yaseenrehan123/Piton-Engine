@@ -128,18 +128,16 @@ export class Engine {
         if(!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
 
         const pos:Vector2 = transform.globalPosition.position;
-        const centeredX = pos.x - sprite.width / 2;
-        const centeredY = pos.y - sprite.height / 2;
 
         this.ctx.save();
 
-        this.ctx.translate(centeredX,centeredY);
+        this.ctx.translate(pos.x,pos.y);
 
         this.ctx.globalAlpha = sprite.alpha;
 
         this.ctx.rotate((sprite.rotation * Math.PI) / 180)
 
-        this.ctx.drawImage(sprite.image,centeredX,centeredY,sprite.width,sprite.height);
+        this.ctx.drawImage(sprite.image,-sprite.width / 2,-sprite.height / 2,sprite.width,sprite.height);
 
         this.ctx.restore();
     };
