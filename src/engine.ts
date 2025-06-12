@@ -1,6 +1,7 @@
-import { AssetResources, EngineOptions, LoadedResources } from "./types";
+import { AssetResources, EngineOptions, LoadedResources, Vector2 } from "./types";
 import { EntityManager } from "entix-ecs";
 import { AssetLoader } from "./assetLoader";
+import { Transform,Sprite } from "./components";
 export class Engine {
     private canvas: HTMLCanvasElement | null = null;
     private ctx: CanvasRenderingContext2D | null = null;
@@ -14,7 +15,8 @@ export class Engine {
     private updateFunctions: Function[] = [];
     private resources: AssetResources = {};
     private assetLoader: AssetLoader | null = null;
-    private loadedResources:LoadedResources = {};
+    private loadedResources: LoadedResources = {};
+    private startFunctions: Function[] = [];
     constructor(options: EngineOptions) {
         this.init(options);
         this.start();
@@ -51,11 +53,14 @@ export class Engine {
         this.assetLoader?.loadAll().then((loadedResources) => {
             this.loadedResources = loadedResources;
             console.log("Resources loaded!", loadedResources);
+            this.startFunctions.forEach((fn) => {
+                fn();
+            });
             // now you can assign to this.resources or something similar
         }).catch((error) => {
-            console.error("Failed to load assets", error);
+            console.error("FAILED TO LOAD ASSETS: ", error);
         });
-        
+
     };
     update(timeStamp: number) {//gameloop
         this.deltaTime = (timeStamp - this.lastFrameTime) / 1000;
@@ -83,7 +88,23 @@ export class Engine {
     public getDeltaTime(): number {
         return this.deltaTime;
     };
-
+    public getImage(key: string): HTMLImageElement {
+        if (!this.loadedResources?.imagesData || !this.loadedResources.imagesData[key]) {
+            throw new Error("LOADED IMAGE RESOURCE " + key + " NOT FOUND!");
+        }
+        return this.loadedResources.imagesData[key];
+    };
+    public getAudio(key: string): HTMLAudioElement {
+        if (!this.loadedResources.audioData || !this.loadedResources.audioData[key]) {
+            throw new Error("LOADED AUDIO RESOURCE " + key + " NOT FOUND!");
+        }
+        return this.loadedResources.audioData[key];
+    };
+    public getJSON<T = any>(key: string): T {
+        if (!this.loadedResources.customJsonData || !(key in this.loadedResources.customJsonData))
+            throw new Error("LOADED JSON RESOURCE " + key + " NOT FOUND!");
+        return this.loadedResources.customJsonData[key] as T;
+    }
     //FUNCTIONS
     public addUpdateFunction(fn: Function) {
         this.updateFunctions.push(fn);
@@ -94,5 +115,32 @@ export class Engine {
             this.updateFunctions.splice(index, 1);
         }
     };
+    public addStartFunction(fn: Function) {
+        this.startFunctions.push(fn);
+    };
+    public removeStartFunction(fn: Function) {
+        const index: number = this.startFunctions.indexOf(fn);
+        if (index > -1) {
+            this.startFunctions.splice(index, 1);
+        }
+    };
+    public drawSprite(transform:Transform,sprite:Sprite){
+        if(!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
 
+        const pos:Vector2 = transform.globalPosition.position;
+        const centeredX = pos.x - sprite.width / 2;
+        const centeredY = pos.y - sprite.height / 2;
+
+        this.ctx.save();
+
+        this.ctx.translate(centeredX,centeredY);
+
+        this.ctx.globalAlpha = sprite.alpha;
+
+        this.ctx.rotate((sprite.rotation * Math.PI) / 180)
+
+        this.ctx.drawImage(sprite.image,centeredX,centeredY,sprite.width,sprite.height);
+
+        this.ctx.restore();
+    };
 }

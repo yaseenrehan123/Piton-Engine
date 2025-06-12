@@ -1,4 +1,4 @@
-import { AssetResources } from "./types";
+import { AssetResources, LoadedResources } from "./types";
 
 export class AssetLoader {
     private resources: AssetResources;
@@ -8,29 +8,29 @@ export class AssetLoader {
     private async fetchData(url: string) {
         try {
             const response = await fetch(url);
-            if(!response.ok){
+            if (!response.ok) {
                 throw new Error(`HTTP Error: ${response.status} ${response.statusText}`)
             }
             return await response.json();
         }
-        catch(error){
+        catch (error) {
             console.error(`❌ Failed to fetch JSON at: ${url}\n`, error);
             throw new Error(`FetchDataError\nURL: ${url}\nReason: ${(error as Error).message}`);
         }
     };
-    private loadImages() : Promise<Record<string,HTMLImageElement>> {
+    private loadImages(): Promise<Record<string, HTMLImageElement>> {
         const imagesUrl: string = this.resources.images_JSON_path ?? '';
-        if (imagesUrl === ''){
+        if (imagesUrl === '') {
             console.warn("NO IMAGES PASSED TO LOAD")
             return Promise.resolve({});
         };
-       return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             this.fetchData(imagesUrl)
                 .then((data) => {
                     const keys: string[] = Object.keys(data);
                     const length: number = keys.length;
                     let loadCount: number = 0;
-                    let images:Record<string,HTMLImageElement> = {};
+                    let images: Record<string, HTMLImageElement> = {};
 
                     keys.forEach((key) => {
                         const image = new Image();

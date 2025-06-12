@@ -1,3 +1,4 @@
+//GENERAL TYPES
 export type EngineOptions = {
     canvas?: HTMLCanvasElement,
     canvasWidth?: number,
@@ -12,5 +13,37 @@ export type AssetResources = {
 export type LoadedResources = {
     imagesData?: Record<string, HTMLImageElement>;
     audioData?: Record<string, HTMLAudioElement>;
-    [key: string]: any; // extra jsons like enemyWaveData, playerStats
+    customJsonData?: Record<string, any>; // extra jsons like enemyWaveData, playerStats
 };
+//ENGINE TYPES
+export type Vector2 = {
+    x:number,
+    y:number
+};
+export type GlobalPosition = {
+    position:Vector2//(x,y)
+};
+export type LocalPosition = {
+    position:Vector2//(x,y)
+};
+//ENTITY OPTIONS TYPES
+export type RotationOptions = {
+    value:number
+};
+export type ScaleOptions = {
+    value:Vector2
+};
+export type TransformOptions = {
+    globalPosition?:Vector2,
+    localPosition?:Vector2,
+    rotation?:RotationOptions,
+    scale?:ScaleOptions
+};
+export type SpriteOptions = {
+    image:HTMLImageElement,
+    width:number,
+    height:number,
+    alpha?:number,
+    rotation?:number
+    layer?:number
+}
