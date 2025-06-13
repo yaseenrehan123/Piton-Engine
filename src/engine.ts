@@ -1,7 +1,7 @@
 import { AssetResources, EngineOptions, LoadedResources, Vector2 } from "./types";
-import { EntityManager } from "entix-ecs";
+import { EntityId, EntityManager } from "entix-ecs";
 import { AssetLoader } from "./assetLoader";
-import { Transform,Sprite } from "./components";
+import { Transform, Sprite, EntityActive, Parent, Scene, Children } from "./components";
 import { renderingSystem } from "./systems";
 export class Engine {
     private canvas: HTMLCanvasElement | null = null;
@@ -18,6 +18,8 @@ export class Engine {
     private assetLoader: AssetLoader | null = null;
     private loadedResources: LoadedResources = {};
     private startFunctions: Function[] = [];
+    private sceneEntities: EntityId[] = [];
+    private currentSceneId: EntityId | null = null;
     constructor(options: EngineOptions) {
         this.init(options);
         this.start();
@@ -67,7 +69,7 @@ export class Engine {
         this.deltaTime = (timeStamp - this.lastFrameTime) / 1000;
         this.lastFrameTime = timeStamp;
 
-        this.ctx?.clearRect(0,0,this.canvasWidth,this.canvasHeight);
+        this.ctx?.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         renderingSystem(this);
 
@@ -109,6 +111,13 @@ export class Engine {
         if (!this.loadedResources.customJsonData || !(key in this.loadedResources.customJsonData))
             throw new Error("LOADED JSON RESOURCE " + key + " NOT FOUND!");
         return this.loadedResources.customJsonData[key] as T;
+    };
+    public getSceneByName(name: string): EntityId | null {
+        for (const id of this.sceneEntities) {
+            const scene = this.entityManager?.getComponent(id, Scene);
+            if (scene && scene.name === name) return id;
+        }
+        return null;
     }
     //FUNCTIONS
     public addUpdateFunction(fn: Function) {
@@ -129,21 +138,68 @@ export class Engine {
             this.startFunctions.splice(index, 1);
         }
     };
-    public drawSprite(transform:Transform,sprite:Sprite){
-        if(!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
+    public drawSprite(transform: Transform, sprite: Sprite) {
+        if (!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
 
-        const pos:Vector2 = transform.globalPosition.position;
+        const pos: Vector2 = transform.globalPosition.position;
 
         this.ctx.save();
 
-        this.ctx.translate(pos.x,pos.y);
+        this.ctx.translate(pos.x, pos.y);
 
         this.ctx.globalAlpha = sprite.alpha;
 
         this.ctx.rotate((sprite.rotation * Math.PI) / 180)
 
-        this.ctx.drawImage(sprite.image,-sprite.width / 2,-sprite.height / 2,sprite.width,sprite.height);
+        this.ctx.drawImage(sprite.image, -sprite.width / 2, -sprite.height / 2, sprite.width, sprite.height);
 
         this.ctx.restore();
     };
+    public isEntityActive(id: EntityId): boolean {
+        let currentEntity: EntityId | null = id;
+
+        while (currentEntity) {
+            const entityActiveComponent: EntityActive | null = this.entityManager?.getComponent(currentEntity, EntityActive) ?? null;
+            const parentComponent: Parent | null = this.entityManager?.getComponent(currentEntity, Parent) ?? null;
+            if (!entityActiveComponent) throw new Error("ENTITY DOES NOT HAVE ENTITYACTIVE COMPONENT IN ISENTITYACTIVE() " + id);
+            if (!parentComponent) throw new Error("ENTITY DOES NOT HAVE PARENT COMPONENT IN ISENTITYACTIVE() " + id);
+            if (entityActiveComponent.value !== true) return false;// return false
+            currentEntity = parentComponent.value;
+        }
+        return true;
+    };
+    public addScene(id: EntityId) {
+        this.sceneEntities.push(id);
+    };
+    public loadScene(id: EntityId) {
+        const sceneComponent = this.entityManager?.getComponent(id, Scene);
+        if (!sceneComponent) throw new Error("Scene component not found on entity: " + id);
+
+        if (this.currentSceneId !== null) {
+            const oldScene = this.entityManager?.getComponent(this.currentSceneId, Scene);
+            oldScene?.onUnload();
+        }
+
+        this.currentSceneId = id;
+        sceneComponent.onLoad();
+    };
+    public addParent(id: EntityId, parentId: EntityId) {
+        if(this.entityManager?.getComponent(id,Scene))throw new Error// scenes dont have parent component!
+        ("CANT ASSIGN PARENT TO A SCENE! " + id);
+        const entityParentComponent = this.entityManager?.getComponent(id, Parent);
+        const parentChildrenComponent = this.entityManager?.getComponent(parentId, Children);
+        if (!entityParentComponent) throw new Error
+            ("ENTITY DOES NOT HAVE PARENT COMPONENT, AND YOU ARE TRYING TO ASSIGN A VALUE! " + id);
+        if (!parentChildrenComponent) throw new Error
+            ("ENTITY DOES NOT HAVE CHILDREN COMPONENT, AND YOU ARE TRYING TO ASSIGN A VALUE! " + id);
+        if (parentChildrenComponent.value.includes(id)) {
+            console.warn
+            ("ENTITY ALREADY HAS THIS PARENT ASSIGNED! ARE YOU ASSIGNING THE SAME PARENT AGAIN ? " + id);
+            return;
+        }
+        entityParentComponent.value = parentId;
+        parentChildrenComponent.value.push(id);
+
+
+    }
 }

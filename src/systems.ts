@@ -1,6 +1,6 @@
 import { EntityId, EntityManager } from "entix-ecs";
 import { Engine } from "./engine";
-import { Transform, Sprite } from "./components";
+import { Transform, Sprite, EntityActive } from "./components";
 
 //RENDERING
 
@@ -13,12 +13,14 @@ export function renderingSystem(engine: Engine) {// some total of all, uses laye
     }[] = [];
 
     for (const id of em.getAllEntities()) {
+        if(!engine.isEntityActive(id)) continue;
         const transform = em.getComponent(id, Transform);
         if (!transform) continue;
 
         // Handle Sprite
         const sprite = em.getComponent(id, Sprite);
         if (sprite) {
+            if(!sprite.active) continue;
             drawCalls.push({
                 layer: sprite.layer ?? 0,
                 drawFn: () => spriteRenderingSystem(engine, id)

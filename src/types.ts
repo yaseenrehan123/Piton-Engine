@@ -1,3 +1,5 @@
+import { EntityId } from "entix-ecs";
+
 //GENERAL TYPES
 export type EngineOptions = {
     canvas?: HTMLCanvasElement,
@@ -28,10 +30,10 @@ export type LocalPosition = {
 };
 //ENTITY OPTIONS TYPES
 export type RotationOptions = {
-    value:number
+    value?:number
 };
 export type ScaleOptions = {
-    value:Vector2
+    value?:Vector2
 };
 export type TransformOptions = {
     globalPosition?:Vector2,
@@ -44,6 +46,18 @@ export type SpriteOptions = {
     width:number,
     height:number,
     alpha?:number,
-    rotation?:number
-    layer?:number
+    rotation?:number,
+    layer?:number,
+    active?:boolean
+};
+export type EntityActiveOptions = {
+    value?:boolean
+};
+export type ParentOptions = {
+    value?:EntityId
+};
+export type SceneOptions = {
+    name:string,
+    onLoad?:Function
+    onUnload?:Function
 }
