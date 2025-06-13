@@ -2,6 +2,7 @@ import { AssetResources, EngineOptions, LoadedResources, Vector2 } from "./types
 import { EntityManager } from "entix-ecs";
 import { AssetLoader } from "./assetLoader";
 import { Transform,Sprite } from "./components";
+import { renderingSystem } from "./systems";
 export class Engine {
     private canvas: HTMLCanvasElement | null = null;
     private ctx: CanvasRenderingContext2D | null = null;
@@ -65,6 +66,10 @@ export class Engine {
     update(timeStamp: number) {//gameloop
         this.deltaTime = (timeStamp - this.lastFrameTime) / 1000;
         this.lastFrameTime = timeStamp;
+
+        this.ctx?.clearRect(0,0,this.canvasWidth,this.canvasHeight);
+
+        renderingSystem(this);
 
         this.updateFunctions.forEach((fn) => {
             fn();

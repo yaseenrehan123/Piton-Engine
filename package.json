@@ -1,6 +1,6 @@
 {
   "name": "piton-engine",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A typescript game engine",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -29,6 +29,6 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "entix-ecs": "^0.0.2"
+    "entix-ecs": "^0.0.3"
   }
 }
