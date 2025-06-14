@@ -40,13 +40,14 @@ export class EntityTemplates {
         return id;
     };
     createRectangleEntity(width:number,height:number,parent?:EntityId){
-        const id = this.createEmptyEntity(parent);
+        const id:EntityId = this.createEmptyEntity(parent);
         this.em.addComponent(id,Shape, new Shape({
             shape: new Rectangle({
                 width:width,
                 height:height
             })
         }));
+        return id;
     };
     createCircleEntity(radius:number, parent?:EntityId){
         const id:EntityId = this.createEmptyEntity(parent);
@@ -55,6 +56,7 @@ export class EntityTemplates {
                 radius:radius
             })
         }));
+        return id;
     };
     createTriangleEntity(s1:Vector2,s2:Vector2,s3:Vector2, parent?:EntityId){
         const id:EntityId = this.createEmptyEntity(parent);
@@ -65,5 +67,6 @@ export class EntityTemplates {
                 s3:s3
             })
         }));
+        return id;
     };
 };

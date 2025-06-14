@@ -5,9 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.9] = 2025-06-14
+## [0.0.10] - 2025-06-14
+## Added
+- Fixed `createShapeEntity` , `createCircleEntity` and `createTriangleEntity` to return entityId upon creation.
+- Fixed `EntityId` import. Can now import `EntityId` as a type using `import type {EntityId} from 'piton-Engine'`.
+
+## [0.0.9] - 2025-06-14
 ### Added
--Fixed `loadScene` function to enable and disable scenes(It was just calling unLoad and load fn's of scenes).
+- Fixed `loadScene` function to enable and disable scenes(It was just calling unLoad and load fn's of scenes).
 - Added `Shape` , `Rectangle` , `Circle` and `Triangle` components for shapes.
 - Added `createShapeEntity` , `createCircleEntity` and `createTriangleEntity` fns in `entityTemplates.ts`.
 - Added `rectangleRenderingSystem` , `circleRenderingSystem`and `triangleRenderingSystem` in `systems.ts`.
