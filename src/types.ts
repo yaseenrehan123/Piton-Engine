@@ -1,4 +1,5 @@
 import { EntityId } from "entix-ecs";
+import { Circle, Rectangle, Triangle } from "./components";
 
 //GENERAL TYPES
 export type EngineOptions = {
@@ -60,4 +61,27 @@ export type SceneOptions = {
     name:string,
     onLoad?:Function
     onUnload?:Function
-}
+};
+export type ShapeType = Rectangle | Circle | Triangle;
+export type ShapeOptions = {
+    shape:ShapeType,
+    color?:string,
+    outlineEnabled?:boolean,
+    outlineWidth?:number,
+    outlineColor?:string,
+    alpha?:number,
+    active?:boolean,
+    layer?:number
+};
+export type RectangleOptions = {
+    width?:number,
+    height?:number
+};
+export type CircleOptions = {
+    radius?:number
+};
+export type TriangleOptions = {
+    s1?:Vector2,
+    s2?:Vector2,
+    s3?:Vector2
+};

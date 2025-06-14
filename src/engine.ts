@@ -138,7 +138,7 @@ export class Engine {
             this.startFunctions.splice(index, 1);
         }
     };
-    public drawSprite(transform: Transform, sprite: Sprite) {
+    public drawSprite(transform: Transform, sprite: Sprite) {// draws a sprite, runs in spriteRenderingSystem(auto handles sprite loading)
         if (!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
 
         const pos: Vector2 = transform.globalPosition.position;
@@ -155,7 +155,7 @@ export class Engine {
 
         this.ctx.restore();
     };
-    public isEntityActive(id: EntityId): boolean {
+    public isEntityActive(id: EntityId): boolean {//checks whether the entity or it's parent chain is active or not
         let currentEntity: EntityId | null = id;
 
         while (currentEntity) {
@@ -168,12 +168,19 @@ export class Engine {
         }
         return true;
     };
-    public addScene(id: EntityId) {
+    public addScene(id: EntityId) {//ads a scene,used upon creating a scene using scene template
         this.sceneEntities.push(id);
     };
-    public loadScene(id: EntityId) {
+    public loadScene(id: EntityId) {//loads a scene
         const sceneComponent = this.entityManager?.getComponent(id, Scene);
         if (!sceneComponent) throw new Error("Scene component not found on entity: " + id);
+
+        for (const sceneEntity of this.sceneEntities) {// turn of all scenes
+            const entityActive = this.entityManager?.getComponent(sceneEntity, EntityActive);
+            if (!entityActive) throw new Error
+                ("SCENE DOES NOT HAVE ENTITY ACTIVE COMPONENT! WONT BE ABLE TO SWITCH TO THIS SCENE! " + sceneEntity);
+            entityActive.value = false;
+        }
 
         if (this.currentSceneId !== null) {
             const oldScene = this.entityManager?.getComponent(this.currentSceneId, Scene);
@@ -181,11 +188,14 @@ export class Engine {
         }
 
         this.currentSceneId = id;
+        const entityActive = this.entityManager?.getComponent(this.currentSceneId, EntityActive);
+        if (!entityActive) throw new Error("Target scene missing EntityActive component!");
+        entityActive.value = true;
         sceneComponent.onLoad();
     };
-    public addParent(id: EntityId, parentId: EntityId) {
-        if(this.entityManager?.getComponent(id,Scene))throw new Error// scenes dont have parent component!
-        ("CANT ASSIGN PARENT TO A SCENE! " + id);
+    public addParent(id: EntityId, parentId: EntityId) {// adds a parent to a entity
+        if (this.entityManager?.getComponent(id, Scene)) throw new Error// scenes dont have parent component!
+            ("CANT ASSIGN PARENT TO A SCENE! " + id);
         const entityParentComponent = this.entityManager?.getComponent(id, Parent);
         const parentChildrenComponent = this.entityManager?.getComponent(parentId, Children);
         if (!entityParentComponent) throw new Error
@@ -194,12 +204,11 @@ export class Engine {
             ("ENTITY DOES NOT HAVE CHILDREN COMPONENT, AND YOU ARE TRYING TO ASSIGN A VALUE! " + id);
         if (parentChildrenComponent.value.includes(id)) {
             console.warn
-            ("ENTITY ALREADY HAS THIS PARENT ASSIGNED! ARE YOU ASSIGNING THE SAME PARENT AGAIN ? " + id);
+                ("ENTITY ALREADY HAS THIS PARENT ASSIGNED! ARE YOU ASSIGNING THE SAME PARENT AGAIN ? " + id);
             return;
         }
         entityParentComponent.value = parentId;
         parentChildrenComponent.value.push(id);
 
-
     }
-}
+};
