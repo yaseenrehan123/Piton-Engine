@@ -75,13 +75,17 @@ export type ShapeOptions = {
 };
 export type RectangleOptions = {
     width?:number,
-    height?:number
+    height?:number,
+    centered?:boolean,
+    rotation?:number
 };
 export type CircleOptions = {
     radius?:number
 };
 export type TriangleOptions = {
-    s1?:Vector2,
-    s2?:Vector2,
-    s3?:Vector2
+    p1?:Vector2,
+    p2?:Vector2,
+    p3?:Vector2,
+    centered?:boolean,
+    rotation?:number
 };

@@ -92,9 +92,13 @@ export class Shape{
 export class Rectangle{
     public width:number;
     public height:number;
+    public centered:boolean = true;
+    public rotation:number = 0;
     constructor(options:RectangleOptions){
         this.width = options.width ?? 40;
         this.height = options.height ?? 40;
+        this.centered = options.centered ?? true;
+        this.rotation = options.rotation ?? 0;
     }
 };
 export class Circle{
@@ -104,12 +108,16 @@ export class Circle{
     }
 };
 export class Triangle{
-    public s1:Vector2;// side 1
-    public s2: Vector2;// side 2
-    public s3 : Vector2 // side 3
+    public p1:Vector2;// side 1
+    public p2: Vector2;// side 2
+    public p3 : Vector2 // side 3
+    public centered:boolean = true;
+    public rotation:number = 0;
     constructor(options:TriangleOptions){
-        this.s1 = options.s1 ?? {x:30,y:0};
-        this.s2 = options.s2 ?? {x:0,y:59};
-        this.s3 = options.s3 ?? {x:30,y:59};
+        this.p1 = options.p1 ?? {x:30,y:0};
+        this.p2 = options.p2 ?? {x:0,y:59};
+        this.p3 = options.p3 ?? {x:30,y:59};
+        this.centered = options.centered ?? true;
+        this.rotation = options.rotation ?? 0;
     }
 };

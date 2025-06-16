@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.11] - 2025-06-16
+## Added
+- Added `centered` property to both `Rectangle` and `Triangle` class.
+- Can access the `centered` property using:
+```ts
+
+const engine: Engine = new Engine(engineOptions);
+const em = engine.getEntityManager();
+const entityTemplates = new EntityTemplates(engine);
+const rectId:EntityId = entityTemplates.createRectangleEntity(50,50);
+const shape = em.getComponent(rectId,Shape);
+if(shape){
+    const rectShape = shape.shape;
+    if(rectShape instanceOf Rectangle){
+        console.log("Is centering enabled? ",rectShape.centered);
+    }
+}
+
+```
+- By default the `centered` property is set to true and all shapes are centered.
+- Added `rotation`property to `Rectangle` and `Triangle` components allowing user to rotate the shapes.
+The rotation is passed in deg and is automatically converted into radians.
+The user can rotation the shapes using:
+```ts
+
+const engine: Engine = new Engine(engineOptions);
+const em = engine.getEntityManager();
+const entityTemplates = new EntityTemplates(engine);
+const rectId:EntityId = entityTemplates.createRectangleEntity(50,50);
+const shape = em.getComponent(rectId,Shape);
+if(shape){
+    const rectShape = shape.shape;
+    if(rectShape instanceOf Rectangle){
+        rectShape.rotation = 30;//rotated 30deg from right
+    }
+}
+
+```
+- The `scale` property in `Transform` now scales the shapes and sprites both horizontally and vertically.
+
 ## [0.0.10] - 2025-06-14
 ## Added
 - Fixed `createShapeEntity` , `createCircleEntity` and `createTriangleEntity` to return entityId upon creation.

@@ -58,13 +58,13 @@ export class EntityTemplates {
         }));
         return id;
     };
-    createTriangleEntity(s1:Vector2,s2:Vector2,s3:Vector2, parent?:EntityId){
+    createTriangleEntity(p1:Vector2,p2:Vector2,p3:Vector2, parent?:EntityId){
         const id:EntityId = this.createEmptyEntity(parent);
         this.em.addComponent(id,Shape, new Shape({
             shape: new Triangle({
-                s1:s1,
-                s2:s2,
-                s3:s3
+                p1:p1,
+                p2:p2,
+                p3:p3
             })
         }));
         return id;

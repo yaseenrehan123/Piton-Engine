@@ -142,10 +142,12 @@ export class Engine {
         if (!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
 
         const pos: Vector2 = transform.globalPosition.position;
-
+       
         this.ctx.save();
 
         this.ctx.translate(pos.x, pos.y);
+
+        this.ctx.scale(transform.scale.value.x,transform.scale.value.y);
 
         this.ctx.globalAlpha = sprite.alpha;
 
