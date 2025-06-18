@@ -25,8 +25,10 @@ export class Engine {
     private input: Input | null = null;
     constructor(options: EngineOptions) {
         this.init(options);
-        this.start();
-        requestAnimationFrame(this.update.bind(this));
+        this.start().then(()=>{
+            requestAnimationFrame(this.update.bind(this));
+        });
+        
     };
     init(options: EngineOptions) {// used to init all the important libs / files
         this.canvas = options.canvas ?? null;
@@ -56,7 +58,7 @@ export class Engine {
         this.input = new Input(this);
         if (!this.input) throw new Error("INPUT NOT FOUND!");
     };
-    start() {//other game stuff
+    async start():Promise<void> {//other game stuff
         this.assetLoader?.loadAll().then((loadedResources) => {
             this.loadedResources = loadedResources;
             console.log("Resources loaded!", loadedResources);

@@ -5,7 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.12] - [Unreleased]
+## [0.0.13] - [2025-06-18]
+## Fixed
+- Update running before start is finished loading assets.
+
+
+## [0.0.12] - [2025-06-18]
 ## Added
 - Added basic input system for touch and mouse press.
 - Added `Input` class. Can get input class using `const input = engine.getInput()`;
