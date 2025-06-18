@@ -25,10 +25,10 @@ export class Engine {
     private input: Input | null = null;
     constructor(options: EngineOptions) {
         this.init(options);
-        this.start().then(()=>{
+        this.start().then(() => {
             requestAnimationFrame(this.update.bind(this));
         });
-        
+
     };
     init(options: EngineOptions) {// used to init all the important libs / files
         this.canvas = options.canvas ?? null;
@@ -58,17 +58,16 @@ export class Engine {
         this.input = new Input(this);
         if (!this.input) throw new Error("INPUT NOT FOUND!");
     };
-    async start():Promise<void> {//other game stuff
-        this.assetLoader?.loadAll().then((loadedResources) => {
-            this.loadedResources = loadedResources;
-            console.log("Resources loaded!", loadedResources);
-            this.startFunctions.forEach((fn) => {
-                fn();
-            });
-            // now you can assign to this.resources or something similar
-        }).catch((error) => {
-            console.error("FAILED TO LOAD ASSETS: ", error);
-        });
+    async start(): Promise<void> {//other game stuff
+        try {
+            const loadedResources = await this.assetLoader?.loadAll();
+            this.loadedResources = loadedResources!;
+            console.log("RESOURCES LOADED! ", loadedResources);
+            this.startFunctions.forEach(fn => fn());
+        }
+        catch (error) {
+            console.error("FAILED TO LOAD ASSETS:", error);
+        }
 
     };
     update(timeStamp: number) {//gameloop
