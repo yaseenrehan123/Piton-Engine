@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.12] - [Unreleased]
+## Added
+- Added basic input system for touch and mouse press.
+- Added `Input` class. Can get input class using `const input = engine.getInput()`;
+- Use `input.getJustPressed()`, `input.getPressed()` and `input.getJustReleased()` for click or touch detection.
+- `input.getJustPressed()` returns true once after a press is detected. Is used to chheck whether a click happend.
+- `input.getPressed()` returns true as long as input is pressed.
+- `input.getReleased()` returns true once after a press is released.
+- Use `input.getPosition()` to get position of current or last pressed location.
+- Added `Text` component. Can now spawn text using `createTextEntity` under `EntityTemplates`.
+- Added Button component. 
+- Added `createRectButton` and `createTexturedButton` functions in `EntityTemplates`.
+- Added `buttonActiveSystem` in systems folder to process button input.
+- Added `rounded` and `roundedRadius` property under `Rectangle` class. Can now use rounded rect for shapes.
+## Removed
+- Removed `localPosition` in `Transform` as it was useless for now. Might reimplement in future.
+
 ## [0.0.11] - 2025-06-16
 ## Added
 - Added `centered` property to both `Rectangle` and `Triangle` class.

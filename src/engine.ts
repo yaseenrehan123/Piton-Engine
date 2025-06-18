@@ -1,8 +1,10 @@
 import { AssetResources, EngineOptions, LoadedResources, Vector2 } from "./types";
 import { EntityId, EntityManager } from "entix-ecs";
 import { AssetLoader } from "./assetLoader";
-import { Transform, Sprite, EntityActive, Parent, Scene, Children } from "./components";
-import { renderingSystem } from "./systems";
+import { Transform, Sprite, EntityActive, Parent, Scene, Children, Rectangle, Shape } from "./components";
+import { renderingSystem } from "./systems/renderingSystem";
+import { Input } from "./input";
+import { buttonActionSystem } from "./systems/buttonActionSystem";
 export class Engine {
     private canvas: HTMLCanvasElement | null = null;
     private ctx: CanvasRenderingContext2D | null = null;
@@ -20,6 +22,7 @@ export class Engine {
     private startFunctions: Function[] = [];
     private sceneEntities: EntityId[] = [];
     private currentSceneId: EntityId | null = null;
+    private input: Input | null = null;
     constructor(options: EngineOptions) {
         this.init(options);
         this.start();
@@ -50,7 +53,8 @@ export class Engine {
         if (!this.entityManager) throw new Error("ENTITY MANAGER NOT FOUND!");
         this.resources = options.resources ?? {};
         this.assetLoader = new AssetLoader(this.resources);
-
+        this.input = new Input(this);
+        if (!this.input) throw new Error("INPUT NOT FOUND!");
     };
     start() {//other game stuff
         this.assetLoader?.loadAll().then((loadedResources) => {
@@ -72,10 +76,13 @@ export class Engine {
         this.ctx?.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         renderingSystem(this);
+        buttonActionSystem(this);
 
         this.updateFunctions.forEach((fn) => {
             fn();
         });
+
+        this.input?.resetStates();
 
         requestAnimationFrame(this.update.bind(this));
     };
@@ -118,6 +125,10 @@ export class Engine {
             if (scene && scene.name === name) return id;
         }
         return null;
+    };
+    getInput(): Input {
+        if (!this.input) throw new Error("INPUT NOT FOUND!");
+        return this.input;
     }
     //FUNCTIONS
     public addUpdateFunction(fn: Function) {
@@ -140,18 +151,20 @@ export class Engine {
     };
     public drawSprite(transform: Transform, sprite: Sprite) {// draws a sprite, runs in spriteRenderingSystem(auto handles sprite loading)
         if (!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
-
+        const selfRotationInRadians = (Math.PI * sprite.rotation) / 180;
+        const transformRotationInRadians = (Math.PI * transform.rotation.value) / 180
+        const totalRotationInRadians = selfRotationInRadians + transformRotationInRadians;
         const pos: Vector2 = transform.globalPosition.position;
-       
+
         this.ctx.save();
 
         this.ctx.translate(pos.x, pos.y);
 
-        this.ctx.scale(transform.scale.value.x,transform.scale.value.y);
+        this.ctx.scale(transform.scale.value.x, transform.scale.value.y);
 
         this.ctx.globalAlpha = sprite.alpha;
 
-        this.ctx.rotate((sprite.rotation * Math.PI) / 180)
+        this.ctx.rotate(totalRotationInRadians)
 
         this.ctx.drawImage(sprite.image, -sprite.width / 2, -sprite.height / 2, sprite.width, sprite.height);
 
@@ -212,5 +225,48 @@ export class Engine {
         entityParentComponent.value = parentId;
         parentChildrenComponent.value.push(id);
 
+    };
+    isEntityBlockingInput(x: number, y: number, layer: number): boolean {
+        const em = this.getEntityManager();
+        let blocked = false;
+
+        // Check all Sprites
+        em.query('All', { transform: Transform, sprite: Sprite }, (_, { transform, sprite }) => {
+            if (!sprite.active || !sprite.blocksInput) return;
+            if (sprite.layer <= layer) return;
+
+            const pos = transform.globalPosition.position;
+            const width = sprite.width * transform.scale.value.x;
+            const height = sprite.height * transform.scale.value.y;
+            const centeredX = pos.x - width / 2;
+            const centeredY = pos.y - height / 2;
+
+            if (x >= centeredX && x <= centeredX + width && y >= centeredY && y <= centeredY + height) {
+                blocked = true;
+            }
+        });
+
+        // Check all Shapes
+        em.query('All', { transform: Transform, shape: Shape }, (_, { transform, shape }) => {
+            if (!shape.active || !shape.blocksInput) return;
+            if (shape.layer <= layer) return;
+
+            const shapeType = shape.shape;
+            if (shapeType instanceof Rectangle) {
+                const width = shapeType.width * transform.scale.value.x;
+                const height = shapeType.height * transform.scale.value.y;
+                const pos = transform.globalPosition.position;
+                const centeredX = pos.x - width / 2;
+                const centeredY = pos.y - height / 2;
+
+                if (x >= centeredX && x <= centeredX + width && y >= centeredY && y <= centeredY + height) {
+                    blocked = true;
+                }
+            }
+            // Add checks for other shape types if needed (e.g., Circle, Polygon)
+        });
+
+        return blocked;
     }
+
 };

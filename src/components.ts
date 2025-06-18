@@ -1,5 +1,5 @@
 import { EntityId } from "entix-ecs";
-import type { Vector2, GlobalPosition, LocalPosition, TransformOptions, ScaleOptions, SpriteOptions, EntityActiveOptions, ParentOptions, SceneOptions, RectangleOptions, CircleOptions, ShapeType, ShapeOptions, TriangleOptions } from "./types";
+import type { Vector2, GlobalPosition, TransformOptions, ScaleOptions, SpriteOptions, EntityActiveOptions, ParentOptions, SceneOptions, RectangleOptions, CircleOptions, ShapeType, ShapeOptions, TriangleOptions, TextOptions, ButtonOptions } from "./types";
 export class Rotation {
     public value: number = 0;
     constructor(value: number = 0) {
@@ -14,12 +14,12 @@ export class Scale {
 };
 export class Transform {
     public globalPosition: GlobalPosition;
-    public localPosition: LocalPosition;
+    //public localPosition: LocalPosition;
     public rotation: Rotation;
     public scale: Scale;
     constructor(options: TransformOptions = {}) {
         this.globalPosition = {position:options.globalPosition ?? {x:0,y:0}};
-        this.localPosition = {position:options.localPosition ?? {x:0,y:0}};
+        //this.localPosition = {position:options.localPosition ?? {x:0,y:0}};
         this.rotation = new Rotation(options.rotation?.value);
         this.scale = new Scale({value:options.scale?.value});
     }
@@ -33,6 +33,7 @@ export class Sprite{
     public rotation: number;
     public layer:number;
     public active:boolean;
+    public blocksInput:boolean = true;
     constructor(options:SpriteOptions){
         this.image = options.image;
         this.width = options.width;
@@ -41,6 +42,7 @@ export class Sprite{
         this.rotation = options.rotation ?? 0;
         this.layer = options.layer ?? 0;
         this.active = options.active ?? true;
+        this.blocksInput = options.blocksInput ?? true;
     }
 };
 export class EntityActive{
@@ -78,6 +80,7 @@ export class Shape{
     public alpha:number = 1;
     public active:boolean = true;
     public layer:number = 0;
+    public blocksInput:boolean = true;
     constructor(options:ShapeOptions){
         this.shape =  options.shape;
         this.color = options.color ?? 'green';
@@ -87,6 +90,7 @@ export class Shape{
         this.alpha = options.alpha ?? 1;
         this.active = options.active ?? true;
         this.layer = options.layer ?? 0;
+        this.blocksInput = options.blocksInput ?? true;
     }
 };   
 export class Rectangle{
@@ -94,11 +98,15 @@ export class Rectangle{
     public height:number;
     public centered:boolean = true;
     public rotation:number = 0;
+    public rounded:boolean = false;
+    public roundedRadius:number = 5;
     constructor(options:RectangleOptions){
         this.width = options.width ?? 40;
         this.height = options.height ?? 40;
         this.centered = options.centered ?? true;
         this.rotation = options.rotation ?? 0;
+        this.rounded = options.rounded ?? false;
+        this.roundedRadius = options.roundRadius ?? 5;
     }
 };
 export class Circle{
@@ -121,3 +129,80 @@ export class Triangle{
         this.rotation = options.rotation ?? 0;
     }
 };
+export class Text{
+    public content:string = 'text';
+    public size:number = 16;
+    public color:string = 'white';
+    public outlineEnabled:boolean = false;
+    public outlineWidth:number = 2;
+    public outlineColor:string = 'black';
+    public alpha:number = 1;
+    public active:boolean = true;
+    public layer:number = 0;
+    public rotation:number = 0;
+    public style:string = 'sans-serif';
+    public maxWidth:number = 200;
+    constructor(options:TextOptions){
+        this.content = options.content ?? 'text';
+        this.size = options.size ?? 16;
+        this.color = options.color ?? 'white';
+        this.outlineEnabled = options.outlineEnabled ?? false;
+        this.outlineWidth = options.outlineWidth ?? 2;
+        this.outlineColor = options.outlineColor ?? 'black';
+        this.alpha = options.alpha ?? 1;
+        this.active = options.active ?? true;
+        this.layer = options.layer ?? 0;
+        this.rotation = options.rotation ?? 0;
+        this.style = options.style ?? 'sans-serif';
+        this.maxWidth = options.maxWidth ?? 200;
+    }
+};
+export class Button{
+    public pressArea:Vector2 = {x:100,y:100};
+    public onJustPressed:Function = ()=>{};
+    public onPress:Function = ()=>{};
+    public onJustReleased:Function = ()=>{};
+    public onJustHovered:Function = ()=>{};
+    public onHovered:Function = ()=>{};
+    public onHoveredReleased:Function = ()=>{};
+    public showPressArea:boolean = false;
+    public pressAreaShowColor:string = 'green';
+    public layer:number = 0;
+    public active:boolean = true;
+    public changeCursorToPointer:boolean = true;
+    public isHovered:boolean = false;
+    constructor(options:ButtonOptions){
+        this.pressArea = options.pressArea ?? {x:100,y:100};
+        this.onJustPressed = options.onJustPressed ?? (()=>{});
+        this.onPress = options.onPress ?? (()=>{});
+        this.onJustReleased = options.onReleased ?? (()=>{});
+        this.onJustHovered = options.onJustHovered ?? (()=>{});
+        this.onHovered = options.onHovered ?? (()=>{});
+        this.onHoveredReleased = options.onHoveredReleased ??(()=>{})
+        this.showPressArea = options.showPressArea ?? false;
+        this.pressAreaShowColor = options.pressAreaShowColor ?? 'green';
+        this.layer = options.layer ?? 0;
+        this.active = options.active ?? true;
+        this.changeCursorToPointer = options.changeCursorToPointer ?? true;
+    }
+};
+/*
+export class RectButton{
+    public button:Button;
+    public shape:Shape;
+    public text:Text;
+    constructor(options:RectButtonOptions){
+        this.button = options.button ?? new Button({
+
+        });
+        this.shape = options.shape ?? new Shape({
+            shape:new Rectangle({
+                
+            })
+        });
+        this.text = options.text ?? new Text({
+
+        })
+    };
+};
+*/
