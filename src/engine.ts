@@ -1,10 +1,11 @@
 import { AssetResources, EngineOptions, LoadedResources, Vector2 } from "./types";
-import { EntityId, EntityManager } from "entix-ecs";
+import { EntityId, EntityManager, ComponentClass } from "entix-ecs";
 import { AssetLoader } from "./assetLoader";
-import { Transform, Sprite, EntityActive, Parent, Scene, Children, Rectangle, Shape } from "./components";
+import { Transform, Sprite, EntityActive, Parent, Scene, Children, Rectangle, Shape, Circle, Triangle, Text, Alignment } from "./components";
 import { renderingSystem } from "./systems/renderingSystem";
 import { Input } from "./input";
 import { buttonActionSystem } from "./systems/buttonActionSystem";
+import { alignmentSystem } from "./systems/alignmentSystem";
 export class Engine {
     private canvas: HTMLCanvasElement | null = null;
     private ctx: CanvasRenderingContext2D | null = null;
@@ -23,14 +24,14 @@ export class Engine {
     private sceneEntities: EntityId[] = [];
     private currentSceneId: EntityId | null = null;
     private input: Input | null = null;
-    constructor(options: EngineOptions) {
+    constructor(options: EngineOptions ={}) {
         this.init(options);
         this.start().then(() => {
             requestAnimationFrame(this.update.bind(this));
         });
 
     };
-    init(options: EngineOptions) {// used to init all the important libs / files
+    private init(options: EngineOptions) {// used to init all the important libs / files
         this.canvas = options.canvas ?? null;
         if (!this.canvas) {// create one
             const newCanvas: HTMLCanvasElement = document.createElement('canvas');
@@ -43,8 +44,8 @@ export class Engine {
         if (this.canvasWidth === 0) this.canvasWidth = this.canvasDefWidth;
         this.canvasHeight = options.canvasHeight ?? 0;
         if (this.canvasHeight === 0) this.canvasHeight = this.canvasDefHeight;
-        this.canvas.width = this.canvasWidth;
-        this.canvas.height = this.canvasHeight;
+        //this.canvas.width = this.canvasWidth;
+        // this.canvas.height = this.canvasHeight;
         const dpr = window.devicePixelRatio || 1;
         this.canvas.width = this.canvasWidth * dpr;
         this.canvas.height = this.canvasHeight * dpr;
@@ -58,7 +59,7 @@ export class Engine {
         this.input = new Input(this);
         if (!this.input) throw new Error("INPUT NOT FOUND!");
     };
-    async start(): Promise<void> {//other game stuff
+    private async start(): Promise<void> {//other game stuff
         try {
             const loadedResources = await this.assetLoader?.loadAll();
             this.loadedResources = loadedResources!;
@@ -70,12 +71,13 @@ export class Engine {
         }
 
     };
-    update(timeStamp: number) {//gameloop
+    private update(timeStamp: number) {//gameloop
         this.deltaTime = (timeStamp - this.lastFrameTime) / 1000;
         this.lastFrameTime = timeStamp;
 
         this.ctx?.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
+        alignmentSystem(this);
         renderingSystem(this);
         buttonActionSystem(this);
 
@@ -95,6 +97,9 @@ export class Engine {
     public getCtx(): CanvasRenderingContext2D {
         if (!this.ctx) throw new Error("CTX NOT FOUND");
         return this.ctx;
+    };
+    public getCanvasBounds(): Vector2 {
+        return { x: this.canvasWidth, y: this.canvasHeight }
     };
     public getEntityManager(): EntityManager {
         if (!this.entityManager) throw new Error("ENTITY MANAGER NOT FOUND!");
@@ -127,10 +132,42 @@ export class Engine {
         }
         return null;
     };
-    getInput(): Input {
+    public getInput(): Input {
         if (!this.input) throw new Error("INPUT NOT FOUND!");
         return this.input;
-    }
+    };
+    public getChildWithComponent<T>(id: EntityId, componentClass: ComponentClass<T>): EntityId | null {//Get first component with class
+        const em: EntityManager = this.getEntityManager();
+        const children = em.getComponent(id, Children);
+        if (!children)
+            throw new Error("CHILDREN COMPONENT NOT FOUND IN GETCHILDWITHCOMPONENT FN" + id);
+        for (const childId of children.value) {
+            const component = em.getComponent(childId, componentClass);
+            if (component) {
+                return childId;
+            }
+        }
+        return null;
+    };
+    public getChildrenWithComponent<T>(id: EntityId, componentClass: ComponentClass<T>): EntityId[] {//Returns all children with specified component
+        const em: EntityManager = this.getEntityManager();
+        const children = em.getComponent(id, Children);
+        let entityArr: EntityId[] = [];
+        if (!children)
+            throw new Error("CHILDREN COMPONENT NOT FOUND IN GETCHILDRENWITHCOMPONENT FN" + id);
+        children.value.forEach((childId: EntityId) => {
+            if (em.getComponent(childId, componentClass)) {
+                entityArr.push(childId);
+            }
+        });
+        return entityArr;
+    };
+    getRandomInt(min: number = 0, max: number = 1): number {
+        return Math.floor(Math.random() * (max - min + 1)) + min
+    };
+    getRandomFloat(min: number = 0, max: number = 1): number {
+        return Math.random() * (max - min) + min;
+    };
     //FUNCTIONS
     public addUpdateFunction(fn: Function) {
         this.updateFunctions.push(fn);
@@ -150,41 +187,31 @@ export class Engine {
             this.startFunctions.splice(index, 1);
         }
     };
-    public drawSprite(transform: Transform, sprite: Sprite) {// draws a sprite, runs in spriteRenderingSystem(auto handles sprite loading)
-        if (!this.ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
-        const selfRotationInRadians = (Math.PI * sprite.rotation) / 180;
-        const transformRotationInRadians = (Math.PI * transform.rotation.value) / 180
-        const totalRotationInRadians = selfRotationInRadians + transformRotationInRadians;
-        const pos: Vector2 = transform.globalPosition.position;
-
-        this.ctx.save();
-
-        this.ctx.translate(pos.x, pos.y);
-
-        this.ctx.scale(transform.scale.value.x, transform.scale.value.y);
-
-        this.ctx.globalAlpha = sprite.alpha;
-
-        this.ctx.rotate(totalRotationInRadians)
-
-        this.ctx.drawImage(sprite.image, -sprite.width / 2, -sprite.height / 2, sprite.width, sprite.height);
-
-        this.ctx.restore();
-    };
     public isEntityActive(id: EntityId): boolean {//checks whether the entity or it's parent chain is active or not
         let currentEntity: EntityId | null = id;
 
-        while (currentEntity) {
+        while (currentEntity !== null) {
             const entityActiveComponent: EntityActive | null = this.entityManager?.getComponent(currentEntity, EntityActive) ?? null;
             const parentComponent: Parent | null = this.entityManager?.getComponent(currentEntity, Parent) ?? null;
             if (!entityActiveComponent) throw new Error("ENTITY DOES NOT HAVE ENTITYACTIVE COMPONENT IN ISENTITYACTIVE() " + id);
-            if (!parentComponent) throw new Error("ENTITY DOES NOT HAVE PARENT COMPONENT IN ISENTITYACTIVE() " + id);
+            // Early return if entity is a Scene
+            const sceneComponent = this.entityManager?.getComponent(currentEntity, Scene);
+            if (sceneComponent) {
+                return entityActiveComponent.value;
+            };
+            if (!parentComponent || parentComponent.value === null) {
+                return entityActiveComponent.value;
+            }
             if (entityActiveComponent.value !== true) return false;// return false
             currentEntity = parentComponent.value;
         }
         return true;
     };
     public addScene(id: EntityId) {//ads a scene,used upon creating a scene using scene template
+        if (this.sceneEntities.includes(id)) {
+            console.warn("THE SCENE YOU ARE TRYING TO ADD IS ALREADY ADDED! " + id);
+            return;
+        }
         this.sceneEntities.push(id);
     };
     public loadScene(id: EntityId) {//loads a scene
@@ -227,47 +254,4 @@ export class Engine {
         parentChildrenComponent.value.push(id);
 
     };
-    isEntityBlockingInput(x: number, y: number, layer: number): boolean {
-        const em = this.getEntityManager();
-        let blocked = false;
-
-        // Check all Sprites
-        em.query('All', { transform: Transform, sprite: Sprite }, (_, { transform, sprite }) => {
-            if (!sprite.active || !sprite.blocksInput) return;
-            if (sprite.layer <= layer) return;
-
-            const pos = transform.globalPosition.position;
-            const width = sprite.width * transform.scale.value.x;
-            const height = sprite.height * transform.scale.value.y;
-            const centeredX = pos.x - width / 2;
-            const centeredY = pos.y - height / 2;
-
-            if (x >= centeredX && x <= centeredX + width && y >= centeredY && y <= centeredY + height) {
-                blocked = true;
-            }
-        });
-
-        // Check all Shapes
-        em.query('All', { transform: Transform, shape: Shape }, (_, { transform, shape }) => {
-            if (!shape.active || !shape.blocksInput) return;
-            if (shape.layer <= layer) return;
-
-            const shapeType = shape.shape;
-            if (shapeType instanceof Rectangle) {
-                const width = shapeType.width * transform.scale.value.x;
-                const height = shapeType.height * transform.scale.value.y;
-                const pos = transform.globalPosition.position;
-                const centeredX = pos.x - width / 2;
-                const centeredY = pos.y - height / 2;
-
-                if (x >= centeredX && x <= centeredX + width && y >= centeredY && y <= centeredY + height) {
-                    blocked = true;
-                }
-            }
-            // Add checks for other shape types if needed (e.g., Circle, Polygon)
-        });
-
-        return blocked;
-    }
-
 };

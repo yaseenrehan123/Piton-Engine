@@ -1,17 +1,19 @@
 import { EntityId } from "entix-ecs";
-import type { Vector2, GlobalPosition, TransformOptions, ScaleOptions, SpriteOptions, EntityActiveOptions, ParentOptions, SceneOptions, RectangleOptions, CircleOptions, ShapeType, ShapeOptions, TriangleOptions, TextOptions, ButtonOptions } from "./types";
-export class Rotation {
+import type { Vector2, GlobalPosition, TransformOptions, ScaleOptions, SpriteOptions, EntityActiveOptions, ParentOptions, SceneOptions, RectangleOptions, CircleOptions, ShapeType, ShapeOptions, TriangleOptions, TextOptions, ButtonOptions, AlignmentHorizontal, AlignmentVertical, AlignmentOptions } from "./types";
+/* PRIVATE COMPONENTS*/
+class Rotation {
     public value: number = 0;
     constructor(value: number = 0) {
         this.value = value ?? 0;
     }
 };
-export class Scale {
+class Scale {
     public value: Vector2 = {x:1,y:1};
     constructor(options:ScaleOptions = {}){
         this.value = options.value ?? {x:1,y:1};
     }
 };
+/*PUBLIC COMPONENTS*/
 export class Transform {
     public globalPosition: GlobalPosition;
     //public localPosition: LocalPosition;
@@ -206,3 +208,13 @@ export class RectButton{
     };
 };
 */
+export class Alignment{// A component to have a entity always fixedly aligned.
+    public alignmentHorizontal:AlignmentHorizontal = 'none';//Horizontal Alignment
+    public alignmentVertical:AlignmentVertical = 'none';//Vertical Alignment
+    public offset:Vector2 = {x:0,y:0};//Offset from aligned position
+    constructor(options:AlignmentOptions){
+        this.alignmentHorizontal = options.alignmentHorizontal ?? 'none';
+        this.alignmentVertical = options.alignmentVertical ?? 'none';
+        this.offset = options.offset ?? {x:0,y:0};
+    }
+};

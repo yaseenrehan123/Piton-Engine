@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.15] - [Unreleased]
+## Added
+- Added `AlignmentHorizontal` and `AlignmentVertical` types in `types.ts`.
+- Added `Alignment` component in component.ts.
+- Added `alignmentSystem.ts` in `systems/alignmentSystem.ts`.
+- Added `getEntitySize` , `isEntityCentered` and `calculatedAlignedPosition` in `engine.ts`.
+- Added circle and triangle support in `isEntityBlockingInput`.
+- Added `getRandomInt()` and `getRandomFloat`() To get random numbers in a range.
+## Removed
+- Removed `Parent` component from scene template in `EntityTemplates.createSceneEntity()`.
+## Changed
+- Changed `EntityTemplates.createRectButtton` to have the text as a separate child entity.
+## Fixed
+- Fixed not able to assign first entity as a Parent in `EntityTemplates`.
+- Fixed use of `maxWidth` property of `Text` in `textRenderingSystem` in `systems/renderingSystem.ts`.
+- Fixed `isEntityBlockingInput` to take centered property into account.(It was only working when rectangle shape was centered).
+
+
 ## [0.0.14] - [2025-06-18]
 ## Fixed
 - Update running before start is finished loading assets(Properly Fixed!).

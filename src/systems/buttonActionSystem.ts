@@ -3,8 +3,12 @@ import { Engine } from "../engine";
 import { Input } from "../input";
 import { Button, Transform } from "../components";
 import { Vector2 } from "../types";
+import { EngineInternals } from "../internals/engineInternals";
+import { InputInternals } from "../internals/inputInternals";
 
 export function buttonActionSystem(engine: Engine) {
+    const engineInternals:EngineInternals = new EngineInternals(engine);
+    const inputInternals:InputInternals = new InputInternals(engine);
     const em: EntityManager = engine.getEntityManager();
     const input: Input = engine.getInput();
     const ctx: CanvasRenderingContext2D = engine.getCtx();
@@ -29,10 +33,10 @@ export function buttonActionSystem(engine: Engine) {
         const centeredX: number = pos.x - w / 2;
         const centeredY: number = pos.y - h / 2;
         
-        const isHovering = input.isOver(centeredX, centeredY, scaledW, scaledH);
+        const isHovering = inputInternals.isOver(centeredX, centeredY, scaledW, scaledH);
 
         if (isHovering) {
-            if(engine.isEntityBlockingInput(input.getPosition().x, input.getPosition().y, button.layer))return;
+            if(engineInternals.isEntityBlockingInput(input.getPosition().x, input.getPosition().y, button.layer))return;
             anyButtonHovered = true;
             if (!button.isHovered) {
                 button.isHovered = true;

@@ -22,13 +22,13 @@ export class Input {
         //console.log("POS", this.x, this.y);
 
     };
-    updatePos(clientX: number, clientY: number) {
+    private updatePos(clientX: number, clientY: number) {
         const canvas: HTMLCanvasElement = this.engine.getCanvas();
         const rect: DOMRect = canvas.getBoundingClientRect();
         this.position.x = clientX - rect.left;
         this.position.y = clientY - rect.top;
     };
-    addListeners() {
+    private addListeners() {
         const pressedListeners = ['mousedown', 'touchstart'];
         const moveListeners = ['mousemove', 'touchmove'];
         const releasedListeners = ['mouseup', 'touchend'];
@@ -67,14 +67,6 @@ export class Input {
     resetStates() {
         this.justPressed = false;//reset
         this.justReleased = false;//reset
-    }
-    isOver(x: number, y: number, w: number, h: number) {
-        return (
-            this.position.x >= x &&
-            this.position.x <= x + w &&
-            this.position.y >= y &&
-            this.position.y <= y + h
-        );
     };
     //GETTERS
     getPosition(): Vector2 {

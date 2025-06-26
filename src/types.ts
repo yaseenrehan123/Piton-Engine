@@ -26,6 +26,8 @@ export type Vector2 = {
 export type GlobalPosition = {
     position: Vector2//(x,y)
 };
+export type AlignmentHorizontal = 'none' | 'left' | 'center' | 'right';
+export type AlignmentVertical = 'none'| 'top' | 'middle' | 'bottom';
 /* //DISABLED
 export type LocalPosition = {
     position:Vector2//(x,y)
@@ -40,7 +42,7 @@ export type ScaleOptions = {
 };
 export type TransformOptions = {
     globalPosition?: Vector2,
-    localPosition?: Vector2,
+    //localPosition?: Vector2,
     rotation?: RotationOptions,
     scale?: ScaleOptions
 };
@@ -130,3 +132,8 @@ export type RectButtonOptions = {
     text?:Text
 };
 */
+export type AlignmentOptions ={
+    alignmentHorizontal?:AlignmentHorizontal,
+    alignmentVertical?:AlignmentVertical,
+    offset?:Vector2
+}

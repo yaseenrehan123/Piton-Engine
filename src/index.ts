@@ -3,5 +3,5 @@ export * from './assetLoader';
 export * from './types';
 export * from './entityTemplates';
 export * from './components';
-export * from './systems/renderingSystem';
-export type {EntityId} from 'entix-ecs';
+export * from './input';
+export type {EntityId,EntityManager} from 'entix-ecs';

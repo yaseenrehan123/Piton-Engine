@@ -2,7 +2,7 @@ import { EntityId, EntityManager } from "entix-ecs";
 import { Engine } from "../engine";
 import { Transform, Sprite, EntityActive, Shape, Rectangle, Circle, Triangle, Text, Button } from "../components";
 import { Vector2 } from "../types";
-
+import { EngineInternals } from "../internals/engineInternals";
 //RENDERING
 
 export function renderingSystem(engine: Engine) {// some total of all, uses layer filter
@@ -82,12 +82,13 @@ export function renderingSystem(engine: Engine) {// some total of all, uses laye
 
 //RENDERING SPRITE , SUB SYSTEM!
 function spriteRenderingSystem(engine: Engine, id: EntityId) {
+    const engineInternals = new EngineInternals(engine);
     const em: EntityManager = engine.getEntityManager();
     const transform = em.getComponent(id, Transform);
     const sprite = em.getComponent(id, Sprite);
     if (!transform) throw new Error("TRANSFORM NULL IN SPRITE RENDERING SYSTEM! " + id);
     if (!sprite) throw new Error("SPRITE NULL IN SPRITE RENDERING SYSTEM! " + id);
-    engine.drawSprite(transform, sprite);
+    engineInternals.drawSprite(transform, sprite);
 };
 
 //RENDERING RECTANGLES, SUB SYSTEM!
@@ -320,7 +321,7 @@ function textRenderingSystem(engine: Engine, id: EntityId) {
     ctx.textBaseline = 'middle';
     ctx.fillStyle = text.color;
     ctx.font = `${text.size}px ${text.style}`;
-    ctx.fillText(text.content, 0, 0, 50);
+    ctx.fillText(text.content, 0, 0, text.maxWidth);
     ctx.closePath();
 
     //OUTLINE

@@ -1,6 +1,6 @@
 import { EntityId, EntityManager } from "entix-ecs";
 import { Engine } from "./engine";
-import { Children, Circle, EntityActive, Parent, Rectangle, Scene, Shape, Sprite, Transform, Triangle, Text, Button } from "./components";
+import { Children, Circle, EntityActive, Parent, Rectangle, Scene, Shape, Sprite, Transform, Triangle, Text, Button, Alignment } from "./components";
 import { Vector2 } from "./types";
 
 export class EntityTemplates {
@@ -17,8 +17,9 @@ export class EntityTemplates {
         this.em.addComponent(id, Parent, new Parent());
         this.em.addComponent(id, Children, new Children());
 
-        if (parent) {//assign only if a valid parent is passed
+        if (parent !== undefined) {//assign only if a valid parent is passed
             this.engine.addParent(id, parent);
+            console.log("CREATE ENTITY ADD PARENT CALLED!");
         }
         return id;
     };
@@ -33,7 +34,9 @@ export class EntityTemplates {
         return id;
     };
     createSceneEntity(name: string = 'unnamedScene'): EntityId {// creates a scene entity
-        const id: EntityId = this.createEmptyEntity();//do not require parent
+        const id: EntityId = this.em.createEntity();
+        this.em.addComponent(id, Transform, new Transform({}));
+        this.em.addComponent(id, EntityActive, new EntityActive({}));
         this.em.addComponent(id, Scene, new Scene({ name: name }));
         this.em.addComponent(id, Children, new Children());
         this.engine.addScene(id);
@@ -88,23 +91,25 @@ export class EntityTemplates {
                 width: width,
                 height: height
             }),
-            blocksInput:false
+            blocksInput: false
         }));
-        this.em.addComponent(id,Text,new Text({
-            content:textContent
+        const id2:EntityId = this.createTextEntity(textContent ?? 'Text',id);
+        this.em.addComponent(id2,Alignment, new Alignment({
+            alignmentHorizontal:'center',
+            alignmentVertical:'middle'
         }));
         return id;
     };
-    createTexturedButtonEntity(image:HTMLImageElement,width:number,height:number,parent?:EntityId):EntityId{
-        const id:EntityId = this.createEmptyEntity(parent);
-        this.em.addComponent(id,Button,new Button({
-            pressArea:{x:width,y:height}
+    createTexturedButtonEntity(image: HTMLImageElement, width: number, height: number, parent?: EntityId): EntityId {
+        const id: EntityId = this.createEmptyEntity(parent);
+        this.em.addComponent(id, Button, new Button({
+            pressArea: { x: width, y: height }
         }));
-        this.em.addComponent(id,Sprite, new Sprite({
-            image:image,
-            width:width,
-            height:height,
-            blocksInput:false
+        this.em.addComponent(id, Sprite, new Sprite({
+            image: image,
+            width: width,
+            height: height,
+            blocksInput: false
         }));
         return id;
     }
