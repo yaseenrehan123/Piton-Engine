@@ -84,10 +84,8 @@ export function renderingSystem(engine: Engine) {// some total of all, uses laye
 function spriteRenderingSystem(engine: Engine, id: EntityId) {
     const engineInternals = new EngineInternals(engine);
     const em: EntityManager = engine.getEntityManager();
-    const transform = em.getComponent(id, Transform);
-    const sprite = em.getComponent(id, Sprite);
-    if (!transform) throw new Error("TRANSFORM NULL IN SPRITE RENDERING SYSTEM! " + id);
-    if (!sprite) throw new Error("SPRITE NULL IN SPRITE RENDERING SYSTEM! " + id);
+    const transform = em.getComponent(id, Transform,true);
+    const sprite = em.getComponent(id, Sprite,true);
     engineInternals.drawSprite(transform, sprite);
 };
 
@@ -95,10 +93,8 @@ function spriteRenderingSystem(engine: Engine, id: EntityId) {
 function rectangleRenderingSystem(engine: Engine, id: EntityId) {
     const em: EntityManager = engine.getEntityManager();
     const ctx = engine.getCtx();
-    const transform = em.getComponent(id, Transform);
-    const shape = em.getComponent(id, Shape);
-    if (!transform) throw new Error("TRANSFORM NULL IN RECTANGLE RENDERING STSTEM !" + id);
-    if (!shape) throw new Error("SHAPE NULL IN RECTANGLE RENDERING SYSTEM! " + id);
+    const transform = em.getComponent(id, Transform,true);
+    const shape = em.getComponent(id, Shape,true);
     const rectangle = shape.shape;
     if ((rectangle instanceof Rectangle)) {
         const x: number = transform.globalPosition.position.x;
@@ -172,10 +168,8 @@ function rectangleRenderingSystem(engine: Engine, id: EntityId) {
 function circleRenderingSystem(engine: Engine, id: EntityId) {
     const em: EntityManager = engine.getEntityManager();
     const ctx = engine.getCtx();
-    const transform = em.getComponent(id, Transform);
-    const shape = em.getComponent(id, Shape);
-    if (!transform) throw new Error("TRANSFORM NULL IN RECTANGLE RENDERING STSTEM !" + id);
-    if (!shape) throw new Error("SHAPE NULL IN RECTANGLE RENDERING SYSTEM! " + id);
+    const transform = em.getComponent(id, Transform,true);
+    const shape = em.getComponent(id, Shape,true);
     if ((shape.shape instanceof Circle)) {
         const x: number = transform.globalPosition.position.x;
         const y: number = transform.globalPosition.position.y;
@@ -227,10 +221,8 @@ function circleRenderingSystem(engine: Engine, id: EntityId) {
 function triangleRenderingSystem(engine: Engine, id: EntityId) {
     const em: EntityManager = engine.getEntityManager();
     const ctx = engine.getCtx();
-    const transform = em.getComponent(id, Transform);
-    const shape = em.getComponent(id, Shape);
-    if (!transform) throw new Error("TRANSFORM NULL IN TRIANGLE RENDERING SYSTEM !" + id);
-    if (!shape) throw new Error("SHAPE NULL IN TRIANGLE RENDERING SYSTEM! " + id);
+    const transform = em.getComponent(id, Transform,true);
+    const shape = em.getComponent(id, Shape,true);
     const triangle = shape.shape;
     if (!(triangle instanceof Triangle)) {
         console.warn("SHAPE IS NOT A TRIANGLE BUT IS IN TRIANGLE RENDERING SYSTEM! " + id);
@@ -298,10 +290,8 @@ function triangleRenderingSystem(engine: Engine, id: EntityId) {
 function textRenderingSystem(engine: Engine, id: EntityId) {
     const em: EntityManager = engine.getEntityManager();
     const ctx: CanvasRenderingContext2D = engine.getCtx();
-    const transform = em.getComponent(id, Transform);
-    const text = em.getComponent(id, Text);
-    if (!transform) throw new Error("TRANSFORM NOT FOUND IN TEXT RENDERING SYSTEM! " + id);
-    if (!text) throw new Error("TEXT NOT FOUND IN TEXT RENDERING SYSTEM! " + id);
+    const transform = em.getComponent(id, Transform,true);
+    const text = em.getComponent(id, Text,true);
 
     const pos: Vector2 = transform.globalPosition.position;
     const selfRotationInRadians = (Math.PI * text.rotation) / 180;
@@ -343,10 +333,8 @@ function textRenderingSystem(engine: Engine, id: EntityId) {
 function buttonPressAreaRendering(engine: Engine, id: EntityId) {
     const em: EntityManager = engine.getEntityManager();
     const ctx: CanvasRenderingContext2D = engine.getCtx();
-    const transform = em.getComponent(id, Transform);
-    const button = em.getComponent(id, Button);
-    if (!transform) throw new Error("TRANSFORM NOT FOUND IN BUTTON PRESSAREA RENDERING SYSTEM! " + id);
-    if (!button) throw new Error("BUTTON NOT FOUND IN BUTTON PRESSAREA RENDERING SYSTEM! " + id);
+    const transform = em.getComponent(id, Transform,true);
+    const button = em.getComponent(id, Button,true);
     const pos: Vector2 = transform?.globalPosition.position;
     const w: number = button.pressArea.x;
     const h: number = button.pressArea.y;

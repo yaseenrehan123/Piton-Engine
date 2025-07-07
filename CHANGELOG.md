@@ -5,7 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.15] - [Unreleased]
+## [0.0.16] - [2025-07-7]
+## Added
+- Added `domInteracted` and `onDOMInteractionFunctions` variables in `engine.ts`.
+- Added private `waitForDOMInteraction()` to check and trigger `domInteracted` in `engine.ts`.
+- Added type `playAudioOptions` in `types.ts`.
+- Added `playAudio()` in `engine.ts`, Checks for `domInteraction` before playing audio.
+- Added `removeChildrenReclusively()` & `unlinkFromParent()` in `engineInternals.ts`.
+- Added `removeEntityWithCleanup()` in engine.ts to remove entity and calls `removeChildrenReclusively()` & `unlinkFromParent()`.
+- Added `ParticleContainer` and `Particle` components in `components.ts`.
+- Added `ParticleContainerOptions` and `ParticleOptions` in `types.ts`.
+- Added `particleSimulationSystem()` and `particleRemovalSystem()` in `particleSimulationSystem.ts` & `particleRemovalSystem.ts` respectively.
+- Added `storageManager.ts` with a storage system.
+- Added `createParticleContainerEntity()` in `EntityTemplates` to create particles and run them.
+- Added overloads for `getSceneByName()` and `getChildWithComponent()` to take a strict parameter to avoid null checks.
+Example:
+```ts
+const sceneId:EntityId = engine.getSceneByName('scene',true); //STRICT, ALWAYS RETURNS VALUE ELSE NULL ERROR
+const childId:EntityId = engine.getChildWithComponent(sceneId,Transform,true);
+```
+## Fixed
+- Added check in `addStartFunction()` and `addUpdateFunction()` to prevent adding function if already added.
+- Implemented `Shape` component to a generic which extends `ShapeType`.
+
+## [0.0.15] - [2025-06-26]
 ## Added
 - Added `AlignmentHorizontal` and `AlignmentVertical` types in `types.ts`.
 - Added `Alignment` component in component.ts.

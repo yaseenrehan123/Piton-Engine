@@ -1,5 +1,5 @@
 import { EntityManager, EntityId } from "entix-ecs";
-import { Sprite, Shape, Text, Rectangle, Circle, Triangle, Scene, Transform, Alignment, Button } from "../components";
+import { Sprite, Shape, Text, Rectangle, Circle, Triangle, Scene, Transform, Alignment, Button, Children, Parent } from "../components";
 import { Vector2 } from "../types";
 import { Engine } from "../engine";
 
@@ -12,12 +12,12 @@ export class EngineInternals {
     //DRAWSPRITE
     drawSprite(transform: Transform, sprite: Sprite) {// draws a sprite, runs in spriteRenderingSystem(auto handles sprite loading)
         const ctx: CanvasRenderingContext2D = this.engine.getCtx();
-        if (!ctx) throw new Error("CTX NOT FOUND IN DRAW SPRITE!");
         const selfRotationInRadians = (Math.PI * sprite.rotation) / 180;
         const transformRotationInRadians = (Math.PI * transform.rotation.value) / 180
         const totalRotationInRadians = selfRotationInRadians + transformRotationInRadians;
         const pos: Vector2 = transform.globalPosition.position;
-
+        const scaledWidth:number = sprite.scale.x * sprite.width;
+        const scaledHeight:number = sprite.scale.y * sprite.height;
         ctx.save();
 
         ctx.translate(pos.x, pos.y);
@@ -28,7 +28,7 @@ export class EngineInternals {
 
         ctx.rotate(totalRotationInRadians)
 
-        ctx.drawImage(sprite.image, -sprite.width / 2, -sprite.height / 2, sprite.width, sprite.height);
+        ctx.drawImage(sprite.image, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
 
         ctx.restore();
     };
@@ -191,9 +191,9 @@ export class EngineInternals {
             return { x: actualWidth, y: text.size };
         }
 
-        const button = em.getComponent(id,Button);//IF THERE IS JUST BUTTON THAN USE IT FOR CENTERING
-        if(button){
-            return {x:button.pressArea.x,y:button.pressArea.x};
+        const button = em.getComponent(id, Button);//IF THERE IS JUST BUTTON THAN USE IT FOR CENTERING
+        if (button) {
+            return { x: button.pressArea.x, y: button.pressArea.x };
         }
 
         return null;
@@ -273,5 +273,34 @@ export class EngineInternals {
 
         return true; // Default assumption
     };
+
+    //REMOVE CHILDREN RECLUSIVELY *DONT NEED STRICTMODE*
+    removeChildrenReclusively(id: EntityId) {
+        const em: EntityManager = this.engine.getEntityManager();
+        const children = em.getComponent(id, Children);
+        if (children) {
+            for (const childId of children.value) {
+                //console.log("CHILD ID:", childId);
+                if (em.hasEntity(childId)) {
+                    this.engine.removeEntityWithCleanup(childId);
+                }
+            }
+        }
+    };
+    
+    //UNLINK FROM PARENT *DONT NEED STRICTMODE*
+    unlinkFromParent(id: EntityId) {
+        const em: EntityManager = this.engine.getEntityManager();
+        const parent = em.getComponent(id, Parent);
+        if (!parent) return;
+
+        if (parent?.value !== null && em.hasEntity(parent.value)) {
+            const parentChildren = em.getComponent(parent.value, Children);
+            if (parentChildren) {
+                parentChildren.value = parentChildren.value.filter(e => e !== id);
+            }
+        }
+    }
+
 }
 

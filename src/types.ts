@@ -28,6 +28,7 @@ export type GlobalPosition = {
 };
 export type AlignmentHorizontal = 'none' | 'left' | 'center' | 'right';
 export type AlignmentVertical = 'none'| 'top' | 'middle' | 'bottom';
+export type ShapeType = Rectangle | Circle | Triangle;
 /* //DISABLED
 export type LocalPosition = {
     position:Vector2//(x,y)
@@ -54,7 +55,8 @@ export type SpriteOptions = {
     rotation?: number,
     layer?: number,
     active?: boolean,
-    blocksInput?: boolean
+    blocksInput?: boolean,
+    scale?:Vector2
 };
 export type EntityActiveOptions = {
     value?: boolean
@@ -67,9 +69,8 @@ export type SceneOptions = {
     onLoad?: Function
     onUnload?: Function
 };
-export type ShapeType = Rectangle | Circle | Triangle;
-export type ShapeOptions = {
-    shape: ShapeType,
+export type ShapeOptions<T extends ShapeType> = {
+    shape: T,
     color?: string,
     outlineEnabled?: boolean,
     outlineWidth?: number,
@@ -136,4 +137,31 @@ export type AlignmentOptions ={
     alignmentHorizontal?:AlignmentHorizontal,
     alignmentVertical?:AlignmentVertical,
     offset?:Vector2
+};
+export type ParticleContainerOptions = {
+    maxNumber?: number,
+    img: HTMLImageElement, //TEXTURE
+    minScaleRange?: Vector2,
+    maxScaleRange?: Vector2,
+    minSpeedRange?: number,
+    maxSpeedRange?: number,
+    minLifeTimeRange?: number,
+    maxLifeTimeRange?: number,
+    minAlphaRange?: number,
+    maxAlphaRange?: number,
+    minRotationRange?: number,
+    maxRotationRange?: number
+    alphaReductionRate?: number,
+    duration?:number
+};
+export type ParticleOptions = {
+    lifeTime: number,
+    velocity: Vector2,
+    alphaReductionRate: number;
+};
+//FUNCTION OPTION TYPES
+export type playAudioOptions = {
+    key:string,
+    loop?:boolean,
+    volume?:number
 }

@@ -1,5 +1,5 @@
 import { EntityId } from "entix-ecs";
-import type { Vector2, GlobalPosition, TransformOptions, ScaleOptions, SpriteOptions, EntityActiveOptions, ParentOptions, SceneOptions, RectangleOptions, CircleOptions, ShapeType, ShapeOptions, TriangleOptions, TextOptions, ButtonOptions, AlignmentHorizontal, AlignmentVertical, AlignmentOptions } from "./types";
+import type { Vector2, GlobalPosition, TransformOptions, ScaleOptions, SpriteOptions, EntityActiveOptions, ParentOptions, SceneOptions, RectangleOptions, CircleOptions, ShapeType, ShapeOptions, TriangleOptions, TextOptions, ButtonOptions, AlignmentHorizontal, AlignmentVertical, AlignmentOptions, ParticleOptions, ParticleContainerOptions } from "./types";
 /* PRIVATE COMPONENTS*/
 class Rotation {
     public value: number = 0;
@@ -36,6 +36,7 @@ export class Sprite{
     public layer:number;
     public active:boolean;
     public blocksInput:boolean = true;
+    public scale:Vector2 = {x:1,y:1};
     constructor(options:SpriteOptions){
         this.image = options.image;
         this.width = options.width;
@@ -45,6 +46,7 @@ export class Sprite{
         this.layer = options.layer ?? 0;
         this.active = options.active ?? true;
         this.blocksInput = options.blocksInput ?? true;
+        this.scale = options.scale ?? {x:1,y:1};
     }
 };
 export class EntityActive{
@@ -73,8 +75,8 @@ export class Scene{
 
     }
 };
-export class Shape{
-    public shape:ShapeType;
+export class Shape<T extends ShapeType>{
+    public shape:T;
     public color:string = 'green';
     public outlineEnabled:boolean = false;
     public outlineWidth:number = 3;
@@ -83,7 +85,7 @@ export class Shape{
     public active:boolean = true;
     public layer:number = 0;
     public blocksInput:boolean = true;
-    constructor(options:ShapeOptions){
+    constructor(options:ShapeOptions<T>){
         this.shape =  options.shape;
         this.color = options.color ?? 'green';
         this.outlineEnabled = options.outlineEnabled ?? false;
@@ -216,5 +218,49 @@ export class Alignment{// A component to have a entity always fixedly aligned.
         this.alignmentHorizontal = options.alignmentHorizontal ?? 'none';
         this.alignmentVertical = options.alignmentVertical ?? 'none';
         this.offset = options.offset ?? {x:0,y:0};
+    }
+};
+export class ParticleContainer {
+    public maxNumber: number;
+    public img: HTMLImageElement; //TEXTURE
+    public minScaleRange: Vector2;
+    public maxScaleRange: Vector2;
+    public minSpeedRange: number;
+    public maxSpeedRange: number;
+    public minLifeTimeRange: number;
+    public maxLifeTimeRange: number;
+    public minAlphaRange: number;
+    public maxAlphaRange: number;
+    public minRotationRange: number;
+    public maxRotationRange: number;
+    public alphaReductionRate: number;
+    public duration:number;
+    public counter:number;
+    constructor(options: ParticleContainerOptions) {
+        this.maxNumber = options.maxNumber ?? 16;
+        this.img = options.img;
+        this.minScaleRange = options.minScaleRange ?? { x: 1, y: 1 };
+        this.maxScaleRange = options.maxScaleRange ?? { x: 2, y: 2 };
+        this.minSpeedRange = options.minSpeedRange ?? 30;
+        this.maxSpeedRange = options.maxSpeedRange ?? 100;
+        this.minLifeTimeRange = options.minLifeTimeRange ?? 1;
+        this.maxLifeTimeRange = options.maxLifeTimeRange ?? 2;
+        this.minAlphaRange = options.minAlphaRange ?? 0.5;
+        this.maxAlphaRange = options.maxAlphaRange ?? 1;
+        this.minRotationRange = options.minRotationRange ?? 0;
+        this.maxRotationRange = options.maxRotationRange ?? 360;
+        this.alphaReductionRate = options.alphaReductionRate ?? 0.4;
+        this.duration = options.duration ?? 1;
+        this.counter = this.duration;
+    }
+};
+export class Particle {
+    public lifeTime: number;
+    public velocity: Vector2;
+    public alphaReductionRate: number;
+    constructor(options: ParticleOptions) {
+        this.lifeTime = options.lifeTime;
+        this.velocity = options.velocity;
+        this.alphaReductionRate = options.alphaReductionRate;
     }
 };

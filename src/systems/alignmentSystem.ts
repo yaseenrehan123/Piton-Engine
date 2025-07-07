@@ -18,8 +18,7 @@ export function alignmentSystem(engine: Engine) {
         //console.log(id);
         if (parentId === null) return;
         
-        const parentTransform = em.getComponent(parentId, Transform);
-        if (!parentTransform) return;
+        const parentTransform = em.getComponent(parentId, Transform,true);
 
         const parentSize = engineInternals.getEntitySize(parentId);
         const childSize = engineInternals.getEntitySize(id);
